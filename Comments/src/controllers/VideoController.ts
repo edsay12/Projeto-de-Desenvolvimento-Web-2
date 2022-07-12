@@ -1,23 +1,34 @@
 import { Request, Response } from "express";
 import { VideosModel } from "../models/VideosModels";
 
+
+type Video = {
+    videoTitle:string,
+    videoUrl:string,
+    likeNumber:number,
+    subject:string,
+    userID:string
+}
+
+
+
 class VideoController {
     //posta um novo video
     async newVideo(req, res: Response) {
-        const {userID, videoTitle, videoUrl, likeNumber, subject,} = req.body;
+        const {userID, videoTitle, videoUrl, likeNumber, subject,description} = req.body;
         const videos = await VideosModel.create({
             userID,
             videoTitle,
             videoUrl:req.file ? req.file.filename : undefined, 
             likeNumber, 
-            subject,});
-            res.redirect('http://localhost:3000/')
-    //         return res.status(201).json({          
-    //             error: false,
-    //             message: 'sucess',
-    //             videos,
+            subject,
+            description});
+            return res.status(201).json({          
+                error: false,
+                message: 'sucess',
+                videos,
             
-    //   });
+      });
       
      }
      //request de um video
@@ -56,6 +67,30 @@ class VideoController {
         await VideosModel.destroy({ where: { id: videoId}});
         return res.status(204).send();
      }
+
+    async findVideoByName(req:Request,res:Response){
+        const videoName:string = req.query.search_query
+        const videos:Video[] = await VideosModel.findAll();
+        // se nao tivaer a query ele retornara todos os videos
+        if(!videoName){
+            return res.status(200).json({
+                error: false, 
+                message: 'sucess', 
+                videosFiltrados:videos})
+            
+            
+        }
+
+        if (!videos) return res.send('Error')
+        const videosFiltrados = videos.filter( 
+            video => video.videoTitle.toLowerCase().includes(videoName.toLowerCase())
+            )
+        return res.status(200).json({
+            error: false, 
+            message: 'sucess', 
+            videosFiltrados})
+        
+    }
 }
 
 export default new VideoController();

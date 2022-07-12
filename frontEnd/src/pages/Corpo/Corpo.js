@@ -7,43 +7,54 @@ import axios from 'axios';
 import '../../static/owen/owl.carousel.css'
 import '../../static/owen/owl.theme.default.min.css'
 import Card from '../cards/cards'
-import { toast } from 'react-toastify';
-
+import Loading from '../../componentes/Loading';
+import { useSelector } from 'react-redux';
 import noUser from '../../static/imgs/no-User.png'
 
 export default function Corpo() {
     const [UserImg, setUserImg] = useState('')
-    const [AllVideos, setAllVideos] = useState([1, 2, 3, 4])
+    const [AllVideos, setAllVideos] = useState([])
+    const [isLoading,setLoading] = useState(true)
+    const [busca,setBusca] = useState([1,2,3])
+    const [userImageapi,setUserImgApi] = useState('')
+    const userId = useSelector(state => state.auth.userId)
+    
+
 
     useEffect(() => {
-        axios.get('http://localhost:8081/videos').then((data) => {
-            var user = data.data.videos
-            setAllVideos(user)
-        })
-        toast.success('eita gota serena')
-
+        GetAllVideos()
+        GetUserPhoto()
+       
     }, [])
+    function GetUserPhoto(){
+        axios.get(`http://localhost:3030/user/${userId}`).then((userApi) => 
+        setUserImgApi(`http://localhost:3030/upload/${userApi.data.user.image}`)
 
+        
+        ).catch((e)=> console.log(e))
 
-
-
-    VerificaLogado()
-    function VerificaLogado() {
-        const data = localStorage.getItem('userToken')
-        if (!data) return;
-
-        const userId = JSON.parse(data).userId
-        if (data) {
-            axios.get(`http://localhost:3030/user/${userId}`).then((userApi) => {
-                setUserImg(userApi.data.user.image)
-            }).catch((e) => {
-                console.log('Erro')
-            })
-        } else {
-            setUserImg(noUser)
-        }
     }
 
+    async function GetAllVideos(){
+      await axios.get('http://localhost:8081/videos').then((data) => {
+            let user = data.data.videos
+            setAllVideos(user)
+            setLoading(false)
+        })
+        
+    }
+
+    function handleChange(e){
+        axios.get(`http://localhost:8081/videos/search?search_query=${e.target.value}`).then((data) => {
+            let user = data.data.videosFiltrados
+            setAllVideos(user)
+        })
+        
+    }
+
+
+
+    
 
 
 
@@ -52,6 +63,7 @@ export default function Corpo() {
 
     return (
         <>
+        <Loading isLoading={isLoading}/>
             <header class="container">
                 <nav class="options">
                     <div class="logo">
@@ -61,19 +73,19 @@ export default function Corpo() {
                     <div class="icons">
                         <i class="fas fa-th-large in_used"></i>
                         <a href="/addvideo"><i class="fas fa-photo-video"></i></a>
-                        <i class="fas fa-gamepad"></i>
+                        <a href="/uservideos"><i class="fas fa-gamepad"></i></a>
                         <i class="fas fa-star"></i>
 
                     </div>
                     <div class="user">
-                        <a href="/userpage"><img src={UserImg ? `http://localhost:3030/upload/${UserImg}` : noUser} alt="" /></a>
+                        <a href="/userpage"><img src={userImageapi ? userImageapi : noUser} alt="" /></a>
                     </div>
 
                 </nav>
 
                 <div class="seacher_bar container">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search for movies of TV series" />
+                    <input type="text" onChange={(e)=> handleChange(e)}  placeholder="Search for movies of TV series" />
 
                 </div>
 

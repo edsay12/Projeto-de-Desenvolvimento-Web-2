@@ -17,11 +17,10 @@ class UserController {
   async newUser(req, res) {
     let user: User = req.body;
     if (!user) {
-      // return res.status(StatusCodes.BAD_REQUEST).Json({
-      //   error: true,
-      //   message: "dont't have user",
-      // });
-      return res.redirect('http://localhost:3000/cadastropage');
+      return res.status(StatusCodes.BAD_REQUEST).Json({
+        error: true,
+        message: "dont't have user",
+      });
     }
 
     // Só vai mandar isso pro banco
@@ -33,29 +32,26 @@ class UserController {
       image: req.file ? req.file.filename : '',
       password: await bcrypt.hash(user.password, 10),
     };
+    console.log(user.userName);
 
     UserModel.create(user).then(() => {
-      // return res.status(StatusCodes.CREATED).json({
-      //   error: false,
-      //   message: 'Sucess',
-      // });
-      return res.redirect('http://localhost:3000/cadastropage');
+      return res.status(StatusCodes.CREATED).json({
+        error: false,
+        message: 'Sucess',
+      });
     }).catch((e) => {
       // Erro 11000 se refere a dados duplicados
       if (e.code === 11000) {
-        // return res.status(StatusCodes.BAD_REQUEST).json({
-        //   error: true,
-        //   message: 'user or email already exists',
-        // });
-        return res.redirect('http://localhost:3000/cadastropage');
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          error: true,
+          message: 'user or email already exists',
+        });
       }
 
-      // return res.status(StatusCodes.BAD_GATEWAY).json({
-      // error: true,
-      // message: 'DataBaseError',
-      // });
-
-      return res.redirect('http://localhost:3000/cadastropage');
+      return res.status(StatusCodes.BAD_GATEWAY).json({
+        error: true,
+        message: 'DataBaseError',
+      });
     });
   }
 
@@ -96,28 +92,30 @@ class UserController {
         });
       }
 
+      const dataUser = await UserModel.findById(req.params.userId);
+      console.log('passrod', dataUser.password);
+
+      // olhar senha do usuario ou se cadastrar
       user = {
         name: user.name,
         sobrenome: user.sobrenome,
         email: user.email,
         userName: user.userName,
         image: req.file ? req.file.filename : undefined,
-        password: user.password ? await bcrypt.hash(user.password, 10) : '', // hash da password
+        password: user.password ? await bcrypt.hash(user.password, 10) : '',
       };
 
       await UserModel.findByIdAndUpdate(req.params.userId, user);
-      // return res.status(StatusCodes.CREATED).send({
-      //   error: false,
-      //   message: 'sucess',
-      // });
-      res.redirect('http://localhost:3000/userpage');
+      return res.status(StatusCodes.CREATED).send({
+        error: false,
+        message: 'sucess',
+      });
     } catch (error) {
       console.log(error);
-      res.redirect('http://localhost:3000/userpage');
-      // return res.status(StatusCodes.BAD_GATEWAY).send({
-      //   error: true,
-      //   message: 'Database Error',
-      // });
+      return res.status(StatusCodes.BAD_GATEWAY).send({
+        error: true,
+        message: 'Database Error',
+      });
     }
   }
 
