@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import Loading from '../../componentes/Loading';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-
+// import nodemailer from 'nodemailer';
 
 export default function CadastroPage() {
     const [email,setEmail] = useState('')
@@ -63,14 +63,41 @@ export default function CadastroPage() {
             formData.append('userImg',userImg)
             try {
                 setIsloading(true)
-                const response = await axios.post(`http://localhost:3030/new`, formData, {
+                const response = await axios.post(`${process.env.REACT_APP_USER_URL}/new`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 })
                 setIsloading(false)
-                toast.success('Sucesso em atualizar usuario')
-                console.log(response)
+                // send email aqui 
+                // mandar um email com o nome eo sobrenome
+                // let transporter = nodemailer.createTransport({
+                //     service: "gmail",
+                //     host: "smtp.google.com",
+                //     port: 587,
+                //     secure: true,
+                //     auth: {
+                //         user: "",
+                //         pass: ""
+                //     }
+                // });
+                
+                // transporter.sendMail({
+                //     from: " <>",
+                //     to: email,
+                //     subject: "teste",
+                //     text: "",
+                //     html: "você foi cadastrado com sucesso! bem-vindo ao nosso!"
+                // }).then(message => {
+                //     console.log(message);
+                
+                // }).catch(err => {
+                //     console.log(err);
+                // });
+
+                
+                toast.success('Cadastro realizado com sucesso')
+                
                 navigate('/loginpage')
 
             } catch (err) {

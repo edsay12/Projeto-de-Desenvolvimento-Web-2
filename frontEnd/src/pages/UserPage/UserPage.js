@@ -32,9 +32,9 @@ export default function UserPage() {
   async function UserDetails() {
     setIsloading(true);
     await axios
-      .get(`http://localhost:3030/user/${userId}`)
+      .get(`${process.env.REACT_APP_USER_URL}/user/${userId}`)
       .then((userApi) => {
-        setUserImg(`http://localhost:3030/upload/${userApi.data.user.image}`);
+        setUserImg(`${process.env.REACT_APP_USER_URL}/upload/${userApi.data.user.image}`);
         setEmail(userApi.data.user.email);
         setName(userApi.data.user.name);
         setSobrenome(userApi.data.user.sobrenome);
@@ -98,7 +98,7 @@ export default function UserPage() {
         setIsloading(true);
         console.log(userToken)
         const response = await axios.post(
-          `http://localhost:3030/update/${userId}`,
+          `${process.env.REACT_APP_USER_URL}/update/${userId}`,
           formData,
           {
             headers: {
@@ -135,7 +135,7 @@ export default function UserPage() {
             <a href="/addvideo">
               <i class="fas fa-photo-video"></i>
             </a>
-            <i class="fas fa-gamepad"></i>
+            <a href="/uservideos"><i class="fas fa-gamepad"></i></a>
             <i class="fas fa-star"></i>
           </div>
           <div className="icons">
