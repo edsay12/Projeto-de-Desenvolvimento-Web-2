@@ -80,4 +80,8 @@ Após isso nosso projeto ja deve estar executando na porta 3000
 
 ## Estrutura do banco de dados sql 
 
+
 <img src='./ReadmeImages/databaseSql.png'>
+
+
+
